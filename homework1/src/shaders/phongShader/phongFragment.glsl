@@ -23,6 +23,7 @@ varying highp vec3 vNormal;
 #define EPS 1e-3
 #define PI 3.141592653589793
 #define PI2 6.283185307179586
+#define INFINITY 1000000.0
 
 uniform sampler2D uShadowMap;
 
@@ -84,28 +85,63 @@ void uniformDiskSamples( const in vec2 randomSeed ) {
 }
 
 float findBlocker( sampler2D shadowMap,  vec2 uv, float zReceiver ) {
-	return 1.0;
+  float zBlocker = 0.0;
+  poissonDiskSamples(uv);
+  int numBlockers = 0;
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    float dep = unpack(texture2D(shadowMap, uv + poissonDisk[i] * 0.007));
+    float bias = 0.01;
+    if (dep + bias < zReceiver) {
+      numBlockers++;
+      zBlocker += dep;
+    }
+  }
+  return numBlockers > 0 ? zBlocker / float(numBlockers) : INFINITY;
 }
 
 float PCF(sampler2D shadowMap, vec4 coords) {
-  return 1.0;
+  vec3 pos = (coords.xyz / coords.w + 1.0) / 2.0;
+  poissonDiskSamples(pos.xy);
+  float visibility = float(NUM_SAMPLES);
+  float bias = 0.01;
+  float filterSize = 0.007;
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    float dep = unpack(texture2D(shadowMap, pos.xy + poissonDisk[i] * filterSize));
+    if (dep + bias < pos.z) visibility -= 1.0;
+  }
+
+  return visibility / float(NUM_SAMPLES);
 }
 
 float PCSS(sampler2D shadowMap, vec4 coords){
-
+  vec3 pos = (coords.xyz / coords.w + 1.0) / 2.0;
   // STEP 1: avgblocker depth
+  float zReceiver = pos.z;
+  float zBlocker = findBlocker(shadowMap, pos.xy, zReceiver);
 
   // STEP 2: penumbra size
+  if (zBlocker > zReceiver) return 1.0;
+  float wLight = 5.0;
+  float wPenumbra = (zReceiver - zBlocker) * wLight / zBlocker;
 
   // STEP 3: filtering
-  
-  return 1.0;
-
+  poissonDiskSamples(pos.xy);
+  float visibility = float(NUM_SAMPLES);
+  float bias = 0.03;
+  float filterSize = 0.001;
+  for (int i = 0; i < NUM_SAMPLES; i++) {
+    float dep = unpack(texture2D(shadowMap, pos.xy + poissonDisk[i] * filterSize * wPenumbra));
+    if (dep + bias < zReceiver) visibility -= 1.0;
+  }
+  return visibility / float(NUM_SAMPLES);
 }
 
 
 float useShadowMap(sampler2D shadowMap, vec4 shadowCoord){
-  return 1.0;
+  vec3 pos = (shadowCoord.xyz / shadowCoord.w + 1.0) / 2.0;
+  float dep = unpack(texture2D(shadowMap, pos.xy));
+  float bias = 0.01;
+  return dep + bias < pos.z ? 0.0 : 1.0;
 }
 
 vec3 blinnPhong() {
@@ -134,12 +170,12 @@ vec3 blinnPhong() {
 void main(void) {
 
   float visibility;
-  //visibility = useShadowMap(uShadowMap, vec4(shadowCoord, 1.0));
-  //visibility = PCF(uShadowMap, vec4(shadowCoord, 1.0));
-  //visibility = PCSS(uShadowMap, vec4(shadowCoord, 1.0));
+  //visibility = useShadowMap(uShadowMap, vPositionFromLight);
+  //visibility = PCF(uShadowMap, vPositionFromLight);
+  visibility = PCSS(uShadowMap, vPositionFromLight);
 
   vec3 phongColor = blinnPhong();
 
-  //gl_FragColor = vec4(phongColor * visibility, 1.0);
-  gl_FragColor = vec4(phongColor, 1.0);
+  gl_FragColor = vec4(phongColor * visibility, 1.0);
+  // gl_FragColor = vec4(phongColor, 1.0);
 }
