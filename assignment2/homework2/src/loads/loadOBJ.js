@@ -59,6 +59,7 @@ function loadOBJ(renderer, path, name, objMaterial, transform) {
 									break;
 								// TODO: Add your PRTmaterial here
 								case 'PRTMaterial':
+									console.log('load PRT Material, envmapId:', guiParams.envmapId);
 									material = buildPRTMaterial(getMat3ValueFromRGB(precomputeL[guiParams.envmapId]),
 										"./src/shaders/PRTShader/PRTVertex.glsl", "./src/shaders/PRTShader/PRTFragment.glsl");
 									break;

@@ -214,7 +214,7 @@ class MeshRender {
 			gl.bindBuffer(gl.ARRAY_BUFFER, this.#precomputeLTBuffer);
 
 			if (this.#currentEnvmap !== guiParams.envmapId) {
-				gl.bufferData(gl.ARRAY_BUpFFER, new Float32Array(precomputeLT[guiParams.envmapId]), gl.STATIC_DRAW);
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(precomputeLT[guiParams.envmapId]), gl.STATIC_DRAW);
 				this.#currentEnvmap = guiParams.envmapId;
 			}
 
