@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/siyuhan/repos/GAMES-202/assignment2/prt/ext/openexr/IlmBase/Half/half.cpp
+assert.h
+-
+half.h
+/Users/siyuhan/repos/GAMES-202/assignment2/prt/ext/openexr/IlmBase/Half/half.h
+toFloat.h
+/Users/siyuhan/repos/GAMES-202/assignment2/prt/ext/openexr/IlmBase/Half/toFloat.h
+eLut.h
+/Users/siyuhan/repos/GAMES-202/assignment2/prt/ext/openexr/IlmBase/Half/eLut.h
+
+/Users/siyuhan/repos/GAMES-202/assignment2/prt/ext/openexr/IlmBase/Half/half.h
+halfExport.h
+/Users/siyuhan/repos/GAMES-202/assignment2/prt/ext/openexr/IlmBase/Half/halfExport.h
+iostream
+-
+
+/Users/siyuhan/repos/GAMES-202/assignment2/prt/ext/openexr/IlmBase/Half/halfExport.h
+
+ext_build/openexr/IlmBase/Half/eLut.h
+
+ext_build/openexr/IlmBase/Half/toFloat.h
+
