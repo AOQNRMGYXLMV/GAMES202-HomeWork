@@ -10,7 +10,7 @@ var envmap = [
 ];
 
 var guiParams = {
-	envmapId: 0
+	envmapId: 3
 }
 
 var cubeMaps = [];
